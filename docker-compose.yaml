@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15.1
+    container_name: postgres15.1
+    restart: always
+    expose:
+      - "5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=cuenca
+      - TZ=America/Guayaquil
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    expose:
+      - "80"
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@prueba.com
+      - PGADMIN_DEFAULT_PASSWORD=prueba
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="Authorised users only!"
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=10
+  nginx:
+    image: jmurillov1/nginx-ups-cuenca:latest
+    container_name: nginx-ups-cuenca
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - pgadmin
+volumes:
+  db_data:
